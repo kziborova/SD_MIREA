@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS Files (
+    id SERIAL PRIMARY KEY,
+    filename VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    size BIGINT,
+    location VARCHAR(1024) NOT NULL,
+    owner_id UUID REFERENCES users(id)
+);
+
+SELECT * FROM Files;

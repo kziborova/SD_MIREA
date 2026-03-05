@@ -1,0 +1,281 @@
+#pragma once
+
+#include <QWidget>
+#include <QShowEvent>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QShortcut>
+#include <QTextEdit>
+#include <QString>
+#include <QLabel>
+#include <QTextCursor>
+#include <QTableWidget>
+#include <QHeaderView>
+#include <QFontMetrics>
+#include <QTimer>
+#include <QtConcurrent>
+#include <QFutureWatcher>
+#include <QProgressBar>
+#include <QtGlobal>
+#include <QDebug>
+
+class ZIPWindow: public QWidget {
+    Q_OBJECT
+
+    public:
+    ZIPWindow(QWidget* parent = nullptr);
+
+    signals:
+    void createZIP();
+    void contentZIP();
+    void editZIP();
+    void extractZIP();
+    void removeZIP();
+    void backToMain();
+
+    private:
+    void setUpUI();
+    void setUpConnections();
+    void setHotKey();
+
+    void onCreateButton();
+    void onContentButton();
+    void onEditButton();
+    void onUploadButton();
+    void onRemoveButton();
+    void onBackButton();
+
+    QPushButton* createButton;
+    QPushButton* contentButton;
+    QPushButton* editButton;
+    QPushButton* uploadButton;
+    QPushButton* removeButton;
+    QPushButton* backButton;
+};
+
+#include "../adapter/qt/qtCheckPathService.h"
+#include "../adapter/qt/qtCheckPathZIPService.h"
+#include "../adapter/qt/qtContentZIPService.h"
+#include "../core/STDCreateZIPService.h"
+#include "../adapter/qt/qtEditZIPService.h"
+#include "../adapter/qt/qtExtractZIPService.h"
+#include "../adapter/qt/qtRemoveFileService.h"
+
+
+class ZIPWindowCreate: public QWidget {
+    Q_OBJECT
+
+    public:
+    ZIPWindowCreate(QWidget* parent = nullptr);
+
+    protected:
+    void showEvent(QShowEvent* event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
+    signals:
+    void backUp();
+    void backToMain();
+
+    private:
+    void setUpUI();
+    void setUpConnections();
+    void setHotKey();
+
+    void onCreateButton();
+    void onUButton();
+    void onBackUpButton();
+    void onBackButton();
+
+    QTCheckPathService checkerPath;
+    STDCreateZIPService crZIP;
+    bool isValidPath();
+    void touchFile();
+    QLabel* pathError;
+    QLabel* pathOk;
+
+    QTextEdit* putPath;
+    QPushButton* pathCreate;
+    QPushButton* uButton;
+    QPushButton* backUpButton;
+    QPushButton* backButton;
+};
+
+class ZIPWindowContent: public QWidget {
+    Q_OBJECT
+
+    public:
+    ZIPWindowContent(QWidget* parent = nullptr);
+
+    protected:
+    void showEvent(QShowEvent* event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
+    signals:
+    void backUp();
+    void backToMain();
+
+    private:
+    void setUpUI();
+    void setUpConnections();
+    void setHotKey();
+
+    void onPathButton();
+    void onUButton();
+    void onBackUpButton();
+    void onBackButton();
+
+    QTCheckPathZIPService checkerPath;
+    QTContentZIPService con;
+
+    bool isValidPath();
+    QLabel* pathError;
+    void loadInformation();
+
+    QTextEdit* putPath;
+    QTableWidget* textInfo;
+    QPushButton* pathButton;
+    QPushButton* uButton;
+    QPushButton* backUpButton;
+    QPushButton* backButton;
+};
+
+class ZIPWindowEdit: public QWidget {
+    Q_OBJECT
+
+    public:
+    ZIPWindowEdit(QWidget* parent = nullptr);
+
+    protected:
+    void showEvent(QShowEvent* event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
+    signals:
+    void backUp();
+    void backToMain();
+
+    private:
+    void setUpUI();
+    void setUpConnections();
+    void setHotKey();
+
+    QSet<int> selectedDelRows;
+    std::vector<std::string> selectedPaths;
+
+    void onPathButton();
+    void onUButton();
+    void onBackUpButton();
+    void onBackButton();
+    void onCompressButton();
+
+    std::unique_ptr<QTEditZIPService> editZIP;
+    QTCheckPathZIPService checkerPath;
+    QTContentZIPService con;
+
+    bool isValidPath();
+    QLabel* pathError;
+    void loadInformation();
+    void onDelCellClicked(int row, int col);
+    void onDelHeaderClicked(int logicalIndex);
+    void updateDelHeader();
+
+    QTextEdit* putPath;
+    QTextEdit* compressEdit;
+    QTableWidget* textInfo;
+    QProgressBar* progressBar;
+    QProgressBar* progressBarCompress;
+    QPushButton* pathButton;
+    QPushButton* compressButton;
+    QPushButton* uButton;
+    QPushButton* backUpButton;
+    QPushButton* backButton;
+    QHeaderView* header;
+    QWidget* compressWidget;
+};
+
+class ZIPWindowExtract: public QWidget {
+    Q_OBJECT
+    public:
+    ZIPWindowExtract(QWidget* parent = nullptr);
+
+    protected:
+    void showEvent(QShowEvent* event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
+    signals:
+    void backUp();
+    void backToMain();
+
+    private:
+    void setUpUI();
+    void setUpConnections();
+    void setHotKey();
+
+    QSet<int> selectedSelRows;
+    std::vector<std::string> selectedPaths;
+
+    void onPathButton();
+    void onUButton();
+    void onBackUpButton();
+    void onBackButton();
+    void onExtractButton();
+    void onSelCellClicked(int row, int col);
+    void loadInformation();
+    bool isValidPath();
+    void onSelHeaderClicked(int logicalIndex);
+    void updateSelHeader();
+
+    std::unique_ptr<QTExtractZIPService> extractZIP;
+    QTCheckPathZIPService checkerPath;
+    QTContentZIPService con;
+
+    QLabel* pathError;
+    QTextEdit* putPath;
+    QTextEdit* extractEdit;
+    QTableWidget* textInfo;
+    QProgressBar* progressBarExtract;
+    QPushButton* pathButton;
+    QPushButton* extractButton;
+    QPushButton* uButton;
+    QPushButton* backUpButton;
+    QPushButton* backButton;
+    QHeaderView* header;
+    QWidget* extractWidget;
+};
+
+class ZIPWindowRemove: public QWidget {
+    Q_OBJECT
+
+    public:
+    ZIPWindowRemove(QWidget* parent = nullptr);
+
+    protected:
+    void showEvent(QShowEvent* event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
+    signals:
+    void backUp();
+    void backToMain();
+
+    private:
+    void setUpUI();
+    void setUpConnections();
+    void setHotKey();
+
+    void onRemoveButton();
+    void onUButton();
+    void onBackUpButton();
+    void onBackButton();
+
+    QTCheckPathService checkerPath;
+    QTRemoveFileService removeFile;
+    bool isValidPath();
+    void delFile();
+    QLabel* pathError;
+    QLabel* pathOk;
+
+    QTextEdit* putPath;
+    QPushButton* pathRemove;
+    QPushButton* uButton;
+    QPushButton* backUpButton;
+    QPushButton* backButton;
+};

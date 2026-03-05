@@ -1,0 +1,18 @@
+#pragma once
+
+#include "../../core/checkPathZIPService.h"
+
+#include <QFileInfo>
+#include <QDir>
+#include <QFile>
+#include <QCoreApplication>
+
+class QTCheckPathZIPService : public CheckPathZIPService {
+    private:
+    PathValidationResZIP path;
+    public:
+    QStringList existingEntries;
+    bool checking(const std::string& rawPath, PathAccessModeZIP  mode) override;
+
+    std::string error() override;
+};
